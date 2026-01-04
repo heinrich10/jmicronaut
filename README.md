@@ -3,7 +3,7 @@
 sample backend using Micronaut, Micronaut Data JDBC, and Flyway DB
 
 ## Pre-requisites
-- java 21
+- java 25
 
 ## How to run
 1. execute `./mvnw mn:run`
