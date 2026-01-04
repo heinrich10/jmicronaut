@@ -26,7 +26,7 @@ CREATE TABLE country
 
 CREATE TABLE person
 (
-    id           BIGSERIAL PRIMARY KEY,
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
     last_name    VARCHAR(100),
     first_name   VARCHAR(100) NOT NULL,
     country_code VARCHAR(2),

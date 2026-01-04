@@ -21,7 +21,7 @@ public class ContinentController {
 
     @Get("/{code}")
     public Optional<Continent> getOne(String code) {
-        return Optional.ofNullable(continentRepository.findByCode(code));
+        return continentRepository.findById(code);
     }
 
     @Get("/")
