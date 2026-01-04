@@ -1,4 +1,4 @@
-INSERT INTO `continents` (`code`, `name`) VALUES
+INSERT INTO `continent` (`code`, `name`) VALUES
 ('AF', 'Africa'),
 ('AN', 'Antarctica'),
 ('AS', 'Asia'),
@@ -7,7 +7,7 @@ INSERT INTO `continents` (`code`, `name`) VALUES
 ('OC', 'Oceania'),
 ('SA', 'South America');
 
-INSERT INTO `countries`
+INSERT INTO `country`
 (`code`, `name`, `phone`, `symbol`, `capital`, `currency`, `continent_code`, `alpha_3`) VALUES
 ('AF', 'Afghanistan', 93, '؋', 'Kabul', 'AFN', 'AS', 'AFG'),
 ('AX', 'Aland Islands', 358, '€', 'Mariehamn', 'EUR', 'EU', 'ALA'),
@@ -262,7 +262,7 @@ INSERT INTO `countries`
 ('ZM', 'Zambia', 260, 'ZK', 'Lusaka', 'ZMW', 'AF', 'ZMB'),
 ('ZW', 'Zimbabwe', 263, '$', 'Harare', 'ZWL', 'AF', 'ZWE');
 
-INSERT INTO `persons` (`last_name`, `first_name`, `country_code`) VALUES
+INSERT INTO `person` (`last_name`, `first_name`, `country_code`) VALUES
 ('Doe', 'John', 'US'),
 ('Cole', 'Adam', 'ES'),
 ('Best', 'Gianluca', 'GB'),

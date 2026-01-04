@@ -3,35 +3,38 @@ DROP TABLE IF EXISTS continents;
 DROP TABLE IF EXISTS persons;
 
 
-create table continents
+CREATE TABLE continent
 (
-    code VARCHAR(2)   not null
-        primary key,
-    name VARCHAR(100) not null
+    code VARCHAR(2)   NOT NULL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
 );
 
-create table countries
+CREATE TABLE country
 (
-    code           VARCHAR(2)   not null
-        primary key,
-    name           VARCHAR(100) not null,
-    phone          INTEGER      not null,
+    code           VARCHAR(2)   NOT NULL PRIMARY KEY,
+    name           VARCHAR(100) NOT NULL,
+    phone          INTEGER      NOT NULL,
     symbol         VARCHAR(10),
     capital        VARCHAR(80),
     currency       VARCHAR(3),
-    continent_code VARCHAR(2)
-        references continents,
-    alpha_3        VARCHAR(3)
+    continent_code VARCHAR(2),
+    alpha_3        VARCHAR(3),
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (continent_code) REFERENCES continent (code) ON DELETE SET NULL
 );
 
-create table persons
+CREATE TABLE person
 (
-    id           INTEGER      not null
-        primary key auto_increment,
+    id           BIGSERIAL PRIMARY KEY,
     last_name    VARCHAR(100),
-    first_name   VARCHAR(100) not null,
-    country_code VARCHAR(2)
-        references countries
+    first_name   VARCHAR(100) NOT NULL,
+    country_code VARCHAR(2),
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (country_code) REFERENCES country (code) ON DELETE SET NULL
 );
+
+CREATE INDEX idx_person_country_code ON person (country_code);
 
 

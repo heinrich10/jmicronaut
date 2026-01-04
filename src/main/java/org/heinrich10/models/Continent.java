@@ -6,7 +6,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 
 @Serdeable
-@MappedEntity("continents")
+@MappedEntity
 public class Continent {
 
     @Id

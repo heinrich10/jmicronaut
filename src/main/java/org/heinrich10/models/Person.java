@@ -1,13 +1,13 @@
 package org.heinrich10.models;
 
-import io.micronaut.data.annotation.GeneratedValue;
-import io.micronaut.data.annotation.Id;
-import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.data.annotation.*;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 
+import java.sql.Timestamp;
+
 @Serdeable
-@MappedEntity("persons")
+@MappedEntity
 public class Person {
 
     @Id
@@ -18,12 +18,17 @@ public class Person {
     private String lastName;
     @NotNull
     private String countryCode;
+    @DateUpdated
+    private Timestamp updatedAt;
+    @DateCreated
+    private Timestamp createdAt;
 
     public Person(Long id, String firstName, String countryCode) {
         this.id = id;
         this.firstName = firstName;
         this.countryCode = countryCode;
     }
+
     public Person(Long id, String firstName, String lastName, String countryCode) {
         this.id = id;
         this.firstName = firstName;
@@ -61,5 +66,21 @@ public class Person {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -1,13 +1,13 @@
 package org.heinrich10.models;
 
-import io.micronaut.data.annotation.Id;
-import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.MappedProperty;
+import io.micronaut.data.annotation.*;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 
+import java.sql.Timestamp;
+
 @Serdeable
-@MappedEntity("countries")
+@MappedEntity
 public class Country {
 
     @Id
@@ -21,6 +21,10 @@ public class Country {
     private String continentCode;
     @MappedProperty("alpha_3")
     private String alpha3;
+    @DateUpdated
+    private Timestamp updatedAt;
+    @DateCreated
+    private Timestamp createdAt;
 
     public String getCode() {
         return code;
@@ -84,5 +88,21 @@ public class Country {
 
     public void setAlpha3(String alpha3) {
         this.alpha3 = alpha3;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

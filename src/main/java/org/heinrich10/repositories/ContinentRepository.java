@@ -6,4 +6,6 @@ import io.micronaut.data.repository.CrudRepository;
 import org.heinrich10.models.Continent;
 
 @JdbcRepository(dialect = Dialect.H2)
-public interface ContinentRepository extends CrudRepository<Continent, String> {}
+public interface ContinentRepository extends CrudRepository<Continent, String> {
+    Continent findByCode(String code);
+}
