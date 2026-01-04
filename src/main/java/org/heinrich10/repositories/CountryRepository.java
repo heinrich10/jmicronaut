@@ -6,4 +6,6 @@ import io.micronaut.data.repository.PageableRepository;
 import org.heinrich10.models.Country;
 
 @JdbcRepository(dialect = Dialect.H2)
-public interface CountryRepository extends PageableRepository<Country, String> {}
+public interface CountryRepository extends PageableRepository<Country, String> {
+
+}
