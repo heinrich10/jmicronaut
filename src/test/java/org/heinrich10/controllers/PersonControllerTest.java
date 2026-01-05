@@ -9,9 +9,11 @@ import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.flywaydb.core.Flyway;
 import org.heinrich10.models.Person;
 import org.heinrich10.requests.CreatePersonRequest;
 import org.heinrich10.requests.UpdatePersonRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -24,6 +26,15 @@ public class PersonControllerTest {
     @Inject
     @Client("/")
     HttpClient client;
+
+    @Inject
+    Flyway flyway;
+
+    @BeforeEach
+    void setup() {
+        flyway.clean();
+        flyway.migrate();
+    }
 
     @Test
     void testPersonLifecycle() {
@@ -60,7 +71,6 @@ public class PersonControllerTest {
 
     @Test
     void testGetAll() {
-        // Get All
         Page<Person> page = client.toBlocking().retrieve(HttpRequest.GET("/persons"), Argument.of(Page.class, Person.class));
         assertNotNull(page);
         assertFalse(page.getContent().isEmpty());
