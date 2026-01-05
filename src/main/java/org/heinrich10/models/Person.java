@@ -23,6 +23,9 @@ public class Person {
     @DateCreated
     private Timestamp createdAt;
 
+    public Person() {
+    }
+
     public Person(Long id, String firstName, String countryCode) {
         this.id = id;
         this.firstName = firstName;

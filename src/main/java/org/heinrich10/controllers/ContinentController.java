@@ -7,6 +7,7 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.heinrich10.models.Continent;
 import org.heinrich10.repositories.ContinentRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExecuteOn(TaskExecutors.BLOCKING)
@@ -25,7 +26,7 @@ public class ContinentController {
     }
 
     @Get("/")
-    public Iterable<Continent> getAll() {
+    public List<Continent> getAll() {
         return continentRepository.findAll();
     }
 }
