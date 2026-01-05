@@ -9,7 +9,6 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.heinrich10.models.Continent;
 import org.heinrich10.models.Country;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +25,18 @@ public class CountryControllerTest {
 
     @Test
     void testGetCountries() {
-        Page<Country> page = client.toBlocking().retrieve(HttpRequest.GET("/countries"), Argument.of(Page.class, Country.class));
+        Page<Country> page = client.toBlocking().retrieve(
+                HttpRequest.GET("/countries"), Argument.of(Page.class, Country.class)
+        );
         assertNotNull(page);
         assertFalse(page.getContent().isEmpty());
     }
 
     @Test
     void testGetOne() {
-        Optional<Country> country = client.toBlocking().retrieve(HttpRequest.GET("/countries/US"), Argument.of(Optional.class, Country.class));
+        Optional<Country> country = client.toBlocking().retrieve(
+                HttpRequest.GET("/countries/US"), Argument.of(Optional.class, Country.class)
+        );
         assertTrue(country.isPresent());
         assertEquals("United States", country.get().getName());
     }
@@ -42,7 +45,7 @@ public class CountryControllerTest {
     void testGetOne404() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> {
             client.toBlocking().retrieve(
-                    HttpRequest.GET("/countries/ZZ"), Argument.of(Optional.class, Continent.class)
+                    HttpRequest.GET("/countries/ZZ"), Argument.of(Optional.class, Country.class)
             );
         });
 
