@@ -13,6 +13,9 @@ public class BasePersonRequest {
     @NotBlank
     private String countryCode;
 
+    public BasePersonRequest() {
+    }
+
     public BasePersonRequest(String firstName, String lastName, String countryCode) {
         this.firstName = firstName;
         this.lastName = lastName;
