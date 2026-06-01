@@ -1,0 +1,214 @@
+### Variables
+@host = http://localhost:8080
+# You can override host in http-client.env.json or here:
+# @no-log
+GET {{host}}/persons
+
+###
+
+# @name CreatePerson
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "countryCode": "US"
+}
+
+> {%
+    client.test("Create person returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Create person has id", function() {
+        client.assert(response.body.id !== undefined, "Missing id in response");
+    });
+    client.global.set("personId", response.body.id);
+%}
+
+###
+
+# @name GetPerson
+GET {{host}}/persons/{{personId}}
+
+> {%
+    client.test("Get person returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Person firstName matches", function() {
+        client.assert(response.body.firstName === "John", "firstName mismatch");
+    });
+%}
+
+###
+
+# @name UpdatePerson
+PUT {{host}}/persons/{{personId}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "countryCode": "CA"
+}
+
+> {%
+    client.test("Update person returns 204", function() {
+        client.assert(response.status === 204, "Expected 204 but got " + response.status);
+    });
+%}
+
+###
+
+# Verify update
+GET {{host}}/persons/{{personId}}
+
+> {%
+    client.test("Updated firstName is Jane", function() {
+        client.assert(response.body.firstName === "Jane", "firstName not updated");
+    });
+    client.test("Updated countryCode is CA", function() {
+        client.assert(response.body.countryCode === "CA", "countryCode not updated");
+    });
+%}
+
+###
+
+# @name GetAllPersons
+GET {{host}}/persons?page=0&size=10
+
+> {%
+    client.test("Get all persons returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Page content exists", function() {
+        client.assert(response.body.content !== undefined, "Missing page content");
+    });
+%}
+
+###
+
+# @name GetPersonNotFound
+GET {{host}}/persons/999999
+
+> {%
+    client.test("Get missing person returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}
+
+###
+
+# @name GetAllCountries
+GET {{host}}/countries?page=0&size=10
+
+> {%
+    client.test("Get all countries returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Countries page is not empty", function() {
+        client.assert(response.body.content.length > 0, "Expected at least one country");
+    });
+%}
+
+###
+
+# @name GetCountry
+GET {{host}}/countries/US
+
+> {%
+    client.test("Get country returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Country name is United States", function() {
+        client.assert(response.body.name === "United States", "Unexpected country name: " + response.body.name);
+    });
+%}
+
+###
+
+# @name GetCountryNotFound
+GET {{host}}/countries/ZZ
+
+> {%
+    client.test("Get missing country returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}
+
+###
+
+# @name GetAllContinents
+GET {{host}}/continents
+
+> {%
+    client.test("Get all continents returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Continents list has 7 items", function() {
+        client.assert(response.body.length === 7, "Expected 7 continents but got " + response.body.length);
+    });
+%}
+
+###
+
+# @name GetContinent
+GET {{host}}/continents/EU
+
+> {%
+    client.test("Get continent returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Continent name is Europe", function() {
+        client.assert(response.body.name === "Europe", "Unexpected continent name: " + response.body.name);
+    });
+%}
+
+###
+
+# @name GetContinentNotFound
+GET {{host}}/continents/ZZ
+
+> {%
+    client.test("Get missing continent returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}
+
+###
+
+# @name CreatePersonInvalid
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Doe",
+  "countryCode": "US"
+}
+
+> {%
+    client.test("Create invalid person returns 400", function() {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}
+
+###
+
+# @name UpdatePersonInvalid
+PUT {{host}}/persons/{{personId}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "countryCode": ""
+}
+
+> {%
+    client.test("Update invalid person returns 400", function() {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}
+
+###

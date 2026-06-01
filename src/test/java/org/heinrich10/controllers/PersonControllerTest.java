@@ -7,6 +7,7 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.flywaydb.core.Flyway;
@@ -74,5 +75,22 @@ public class PersonControllerTest {
         Page<Person> page = client.toBlocking().retrieve(HttpRequest.GET("/persons"), Argument.of(Page.class, Person.class));
         assertNotNull(page);
         assertFalse(page.getContent().isEmpty());
+    }
+
+    @Test
+    void testGetOne404() {
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> {
+            client.toBlocking().retrieve(HttpRequest.GET("/persons/999999"), Argument.of(Optional.class, Person.class));
+        });
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    }
+
+    @Test
+    void testCreateInvalid() {
+        CreatePersonRequest invalid = new CreatePersonRequest("", "", "US");
+        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> {
+            client.toBlocking().retrieve(HttpRequest.POST("/persons", invalid), Person.class);
+        });
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 }
