@@ -72,7 +72,7 @@ http/                             # IntelliJ HTTP Client request files
 # Run the application (development)
 ./mvnw mn:run
 
-# Build the project and create the shaded JAR
+# Build the project and create the JAR
 ./mvnw clean package
 
 # Run all tests

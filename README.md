@@ -29,12 +29,12 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 3. The application starts on port `8080`
 4. Call the API endpoint: `curl http://localhost:8080/persons`
 
-The H2 web console is also started programmatically on a random port (see `Application.java`).
+The H2 web console is also started programmatically on port `8082` by default (see `Application.java`).
 
 ## Build
 
 ```bash
-# Build the project and create the shaded JAR
+# Build the project and create the JAR
 ./mvnw clean package
 ```
 
