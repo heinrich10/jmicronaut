@@ -2,16 +2,12 @@ package org.heinrich10.models;
 
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.validation.constraints.NotNull;
 
-@Serdeable
 @MappedEntity
 public class Continent {
 
     @Id
     private String code;
-    @NotNull
     private String name;
 
     public String getCode() {

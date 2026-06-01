@@ -7,8 +7,9 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import org.heinrich10.models.Country;
-import org.heinrich10.repositories.CountryRepository;
+import jakarta.inject.Inject;
+import org.heinrich10.dto.responses.CountryResponse;
+import org.heinrich10.services.CountryService;
 
 import java.util.Optional;
 
@@ -16,24 +17,24 @@ import java.util.Optional;
 @Controller("/countries")
 public class CountryController {
 
-    protected final CountryRepository countryRepository;
+    private final CountryService countryService;
 
-    public CountryController(CountryRepository countryRepository) {
-        this.countryRepository = countryRepository;
+    @Inject
+    public CountryController(CountryService countryService) {
+        this.countryService = countryService;
     }
 
     @Get("/{code}")
-    public Optional<Country> getOne(String code) {
-        return countryRepository.findById(code);
+    public Optional<CountryResponse> getOne(String code) {
+        return countryService.findById(code);
     }
 
     @Get("/")
-    public Page<Country> getAll(
+    public Page<CountryResponse> getAll(
             @QueryValue(defaultValue = "0") Integer page,
             @QueryValue(defaultValue = "10") Integer size
     ) {
         Pageable pageable = Pageable.from(page, size);
-
-        return countryRepository.findAll(pageable);
+        return countryService.findAll(pageable);
     }
 }

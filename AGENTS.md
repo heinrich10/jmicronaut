@@ -4,7 +4,7 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 
 ## Technology Stack
 
-- **Language**: Java 25
+- **Language**: Java 25 (uses records for DTOs)
 - **Framework**: Micronaut 4.10.6
 - **Build Tool**: Maven (wrapper included)
 - **Runtime**: Netty (micronaut-http-server-netty)
@@ -21,49 +21,68 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 ## Project Structure
 
 ```
-src/main/java/org/heinrich10/
-├── Application.java              # Entry point; also starts H2 web console
-├── controllers/                  # REST API controllers
-│   ├── ContinentController.java
-│   ├── CountryController.java
-│   └── PersonController.java
-├── models/                       # Entity / domain models
-│   ├── Continent.java
-│   ├── Country.java
-│   └── Person.java
-├── repositories/                 # Micronaut Data JDBC repositories
-│   ├── ContinentRepository.java
-│   ├── CountryRepository.java
-│   └── PersonRepository.java
-└── requests/                     # Request DTOs for validation & binding
-    ├── BasePersonRequest.java
-    ├── CreatePersonRequest.java
-    └── UpdatePersonRequest.java
-
-src/main/resources/
-├── application.properties        # Datasource & Flyway config
-├── logback.xml                   # Logging configuration
-└── db/migration/
-    ├── V1__schema.sql            # DDL: continent, country, person tables
-    └── V2__seed.sql              # Seed data: continents, countries, sample persons
-
-src/test/java/org/heinrich10/
-├── ApplicationTest.java
-├── controllers/                  # HTTP client integration tests
-│   ├── ContinentControllerTest.java
-│   ├── CountryControllerTest.java
-│   └── PersonControllerTest.java
-└── repositories/
-    └── PersonRepositoryTest.java # Direct repository CRUD test
-
-src/test/resources/
-└── application-test.properties   # Test-specific datasource & Flyway overrides
-
-http/                             # IntelliJ HTTP Client request files
-├── person.http
-├── country.http
-├── continent.http
-└── http-client.env.json
+.
+├── .github/
+│   └── workflows/
+│       └── maven.yml             # CI: GitHub Actions
+├── http/                         # IntelliJ HTTP Client request files
+│   ├── continent.http
+│   ├── country.http
+│   ├── http-client.env.json
+│   └── person.http
+├── src/
+│   ├── main/
+│   │   ├── java/org/heinrich10/
+│   │   │   ├── Application.java              # Entry point; also starts H2 web console
+│   │   │   ├── controllers/                  # REST API controllers
+│   │   │   │   ├── ContinentController.java
+│   │   │   │   ├── CountryController.java
+│   │   │   │   └── PersonController.java
+│   │   │   ├── dto/                          # Data transfer objects
+│   │   │   │   ├── requests/                 # Request DTOs for validation & binding
+│   │   │   │   │   ├── BasePersonRequest.java
+│   │   │   │   │   ├── CreatePersonRequest.java
+│   │   │   │   │   └── UpdatePersonRequest.java
+│   │   │   │   └── responses/                # API response DTOs (serialization only)
+│   │   │   │       ├── ContinentResponse.java
+│   │   │   │       ├── CountryResponse.java
+│   │   │   │       └── PersonResponse.java
+│   │   │   ├── models/                       # Entity / domain models (persistence only)
+│   │   │   │   ├── Continent.java
+│   │   │   │   ├── Country.java
+│   │   │   │   └── Person.java
+│   │   │   ├── repositories/                 # Micronaut Data JDBC repositories
+│   │   │   │   ├── ContinentRepository.java
+│   │   │   │   ├── CountryRepository.java
+│   │   │   │   └── PersonRepository.java
+│   │   │   └── services/                     # Business logic / use-case layer
+│   │   │       ├── ContinentService.java
+│   │   │       ├── CountryService.java
+│   │   │       └── PersonService.java
+│   │   └── resources/
+│   │       ├── application.properties        # Datasource & Flyway config
+│   │       ├── logback.xml                   # Logging configuration
+│   │       └── db/migration/
+│   │           ├── V1__schema.sql            # DDL: continent, country, person tables
+│   │           └── V2__seed.sql              # Seed data: continents, countries, sample persons
+│   └── test/
+│       ├── java/org/heinrich10/
+│       │   ├── ApplicationTest.java
+│       │   ├── controllers/                  # HTTP client integration tests
+│       │   │   ├── ContinentControllerTest.java
+│       │   │   ├── CountryControllerTest.java
+│       │   │   └── PersonControllerTest.java
+│       │   └── repositories/
+│       │       └── PersonRepositoryTest.java # Direct repository CRUD test
+│       └── resources/
+│           └── application-test.properties   # Test-specific datasource & Flyway overrides
+├── AGENTS.md
+├── aot-jar.properties
+├── LICENSE
+├── micronaut-cli.yml
+├── pom.xml
+├── mvnw
+└── mvnw.bat
 ```
 
 ## Build and Run Commands
@@ -90,7 +109,7 @@ The application starts on port `8080` by default. The H2 web console is also sta
 |------------|------------------|------------------------------|
 | Persons    | `GET /persons`   | Paginated list of persons    |
 | Persons    | `GET /persons/{id}` | Get a single person       |
-| Persons    | `POST /persons`  | Create a new person          |
+| Persons    | `POST /persons`  | Create a new person (`201 Created`) |
 | Persons    | `PUT /persons/{id}` | Update an existing person |
 | Countries  | `GET /countries` | Paginated list of countries  |
 | Countries  | `GET /countries/{code}` | Get a single country   |
@@ -110,8 +129,11 @@ Three main entities with simple foreign-key relationships:
 - **Base package**: `org.heinrich10` (note: `micronaut-cli.yml` still lists `com.example` as the default package from project generation, but all source code lives under `org.heinrich10`).
 - **Constructor injection** is used throughout; no `@Autowired` on fields.
 - Controllers are annotated with `@ExecuteOn(TaskExecutors.BLOCKING)` because they perform blocking JDBC operations.
-- Entity classes use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`).
-- Request DTOs extend a shared base class (`BasePersonRequest`) and use Jakarta Validation annotations (`@NotNull`, `@NotBlank`).
+- **Layered architecture**: Controllers → Services → Repositories. Controllers delegate business logic to services; they do not call repositories directly.
+- **API boundary**: Controllers return dedicated response DTOs (Java records under `dto/responses/`), never `@MappedEntity` classes. Entities are strictly for persistence.
+- Entity classes use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`). They are **not** annotated with `@Serdeable`.
+- Request DTOs live under `dto/requests/`, extend a shared base class (`BasePersonRequest`), and use Jakarta Validation annotations (`@NotNull`, `@NotBlank`).
+- Response DTOs live under `dto/responses/` as Java records with `@Serdeable`.
 - Repositories are interfaces extending `PageableRepository` (or `CrudRepository` for `Continent`) and annotated with `@JdbcRepository(dialect = Dialect.H2)`.
 - The project uses **properties** format for configuration (`application.properties`), not YAML.
 
@@ -124,6 +146,7 @@ Three main entities with simple foreign-key relationships:
 - **Test isolation**: `PersonControllerTest` resets the database before each test by calling `flyway.clean()` and `flyway.migrate()` in a `@BeforeEach` method.
 - **Focused tests**: `PersonControllerTest` uses a `@Nested` class (`WhenPersonExists`) with shared setup to keep lifecycle tests small and single-purpose.
 - **Test config** (`application-test.properties`) enables `flyway.datasources.default.clean-schema=true` so Flyway can clean the schema during tests.
+- **Status code verification**: `PersonControllerTest` verifies that `POST /persons` returns `201 Created` with a `Location` header.
 - **Manual testing**: The `http/` directory contains IntelliJ HTTP Client files for ad-hoc API exploration and smoke testing.
 
 ## Continuous Integration
@@ -137,7 +160,7 @@ A GitHub Actions workflow (`.github/workflows/maven.yml`) runs on pushes and pul
 ## Security Considerations
 
 - The application uses an **in-memory H2 database** with default credentials (`sa` / empty password). This is fine for a sample/demo project but must be replaced with a persistent, properly secured database for production.
-- The H2 web console is started on a random port by default. In production, exposing the H2 console is a security risk.
+- The H2 web console is started on port `8082` by default. In production, exposing the H2 console is a security risk.
 - No authentication or authorization layer is implemented.
 - OpenAPI annotations are present; generated spec is available at runtime.
 

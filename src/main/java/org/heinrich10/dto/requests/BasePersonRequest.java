@@ -1,8 +1,7 @@
-package org.heinrich10.requests;
+package org.heinrich10.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.heinrich10.models.Person;
 
 public class BasePersonRequest {
     @NotNull
@@ -45,13 +44,4 @@ public class BasePersonRequest {
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
     }
-
-    public Person toPerson() {
-        return new Person(null, firstName, lastName, countryCode);
-    }
-
-    public Person toPerson(Long id) {
-        return new Person(id, firstName, lastName, countryCode);
-    }
 }
-

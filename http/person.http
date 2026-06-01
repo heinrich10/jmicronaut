@@ -20,8 +20,11 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Create person returns 200", function() {
-        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    client.test("Create person returns 201", function() {
+        client.assert(response.status === 201, "Expected 201 but got " + response.status);
+    });
+    client.test("Create person has Location header", function() {
+        client.assert(response.headers.valueOf("Location") !== undefined, "Missing Location header");
     });
     client.test("Create person has id", function() {
         client.assert(response.body.id !== undefined, "Missing id in response");
