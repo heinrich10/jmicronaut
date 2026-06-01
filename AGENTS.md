@@ -58,6 +58,12 @@ src/test/java/org/heinrich10/
 
 src/test/resources/
 └── application-test.properties   # Test-specific datasource & Flyway overrides
+
+http/                             # IntelliJ HTTP Client request files
+├── person.http
+├── country.http
+├── continent.http
+└── http-client.env.json
 ```
 
 ## Build and Run Commands
@@ -116,7 +122,9 @@ Three main entities with simple foreign-key relationships:
 - **Controller tests** inject an HTTP client (`@Client("/") HttpClient`) and exercise endpoints end-to-end.
 - **Repository tests** inject the repository directly and test CRUD operations against the real database.
 - **Test isolation**: `PersonControllerTest` resets the database before each test by calling `flyway.clean()` and `flyway.migrate()` in a `@BeforeEach` method.
+- **Focused tests**: `PersonControllerTest` uses a `@Nested` class (`WhenPersonExists`) with shared setup to keep lifecycle tests small and single-purpose.
 - **Test config** (`application-test.properties`) enables `flyway.datasources.default.clean-schema=true` so Flyway can clean the schema during tests.
+- **Manual testing**: The `http/` directory contains IntelliJ HTTP Client files for ad-hoc API exploration and smoke testing.
 
 ## Continuous Integration
 

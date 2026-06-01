@@ -49,6 +49,20 @@ Code coverage report (JaCoCo) is generated automatically during the `prepare-pac
 
 Tests use `@MicronautTest` for integration testing with the full application context. Controller tests exercise endpoints end-to-end via an HTTP client, and repository tests validate CRUD operations against the real database.
 
+### HTTP Client Files
+
+The `http/` directory contains IntelliJ HTTP Client request files for manual API testing:
+
+```bash
+http/
+├── person.http
+├── country.http
+├── continent.http
+└── http-client.env.json
+```
+
+Open any `.http` file in IntelliJ IDEA and click the run icon next to a request to execute it.
+
 ## API Overview
 
 | Resource   | Endpoint              | Description                  |
