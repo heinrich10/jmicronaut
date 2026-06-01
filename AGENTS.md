@@ -27,7 +27,7 @@ src/main/java/org/heinrich10/
 │   ├── ContinentController.java
 │   ├── CountryController.java
 │   └── PersonController.java
-├── models/                       # Entity / domain models
+├── models/                       # Entity / domain models (persistence only)
 │   ├── Continent.java
 │   ├── Country.java
 │   └── Person.java
@@ -35,10 +35,18 @@ src/main/java/org/heinrich10/
 │   ├── ContinentRepository.java
 │   ├── CountryRepository.java
 │   └── PersonRepository.java
-└── requests/                     # Request DTOs for validation & binding
-    ├── BasePersonRequest.java
-    ├── CreatePersonRequest.java
-    └── UpdatePersonRequest.java
+├── requests/                     # Request DTOs for validation & binding
+│   ├── BasePersonRequest.java
+│   ├── CreatePersonRequest.java
+│   └── UpdatePersonRequest.java
+├── responses/                    # API response DTOs (serialization only)
+│   ├── ContinentResponse.java
+│   ├── CountryResponse.java
+│   └── PersonResponse.java
+└── services/                     # Business logic / use-case layer
+    ├── ContinentService.java
+    ├── CountryService.java
+    └── PersonService.java
 
 src/main/resources/
 ├── application.properties        # Datasource & Flyway config
@@ -90,7 +98,7 @@ The application starts on port `8080` by default. The H2 web console is also sta
 |------------|------------------|------------------------------|
 | Persons    | `GET /persons`   | Paginated list of persons    |
 | Persons    | `GET /persons/{id}` | Get a single person       |
-| Persons    | `POST /persons`  | Create a new person          |
+| Persons    | `POST /persons`  | Create a new person (`201 Created`) |
 | Persons    | `PUT /persons/{id}` | Update an existing person |
 | Countries  | `GET /countries` | Paginated list of countries  |
 | Countries  | `GET /countries/{code}` | Get a single country   |
@@ -110,7 +118,9 @@ Three main entities with simple foreign-key relationships:
 - **Base package**: `org.heinrich10` (note: `micronaut-cli.yml` still lists `com.example` as the default package from project generation, but all source code lives under `org.heinrich10`).
 - **Constructor injection** is used throughout; no `@Autowired` on fields.
 - Controllers are annotated with `@ExecuteOn(TaskExecutors.BLOCKING)` because they perform blocking JDBC operations.
-- Entity classes use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`).
+- **Layered architecture**: Controllers → Services → Repositories. Controllers delegate business logic to services; they do not call repositories directly.
+- **API boundary**: Controllers return dedicated response DTOs (records under `responses/`), never `@MappedEntity` classes. Entities are strictly for persistence.
+- Entity classes use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`). They are **not** annotated with `@Serdeable`.
 - Request DTOs extend a shared base class (`BasePersonRequest`) and use Jakarta Validation annotations (`@NotNull`, `@NotBlank`).
 - Repositories are interfaces extending `PageableRepository` (or `CrudRepository` for `Continent`) and annotated with `@JdbcRepository(dialect = Dialect.H2)`.
 - The project uses **properties** format for configuration (`application.properties`), not YAML.

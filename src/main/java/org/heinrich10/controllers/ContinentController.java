@@ -4,8 +4,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import org.heinrich10.models.Continent;
-import org.heinrich10.repositories.ContinentRepository;
+import org.heinrich10.responses.ContinentResponse;
+import org.heinrich10.services.ContinentService;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,19 +14,19 @@ import java.util.Optional;
 @Controller("/continents")
 public class ContinentController {
 
-    protected final ContinentRepository continentRepository;
+    protected final ContinentService continentService;
 
-    public ContinentController(ContinentRepository continentRepository) {
-        this.continentRepository = continentRepository;
+    public ContinentController(ContinentService continentService) {
+        this.continentService = continentService;
     }
 
     @Get("/{code}")
-    public Optional<Continent> getOne(String code) {
-        return continentRepository.findById(code);
+    public Optional<ContinentResponse> getOne(String code) {
+        return continentService.findById(code);
     }
 
     @Get("/")
-    public List<Continent> getAll() {
-        return continentRepository.findAll();
+    public List<ContinentResponse> getAll() {
+        return continentService.findAll();
     }
 }

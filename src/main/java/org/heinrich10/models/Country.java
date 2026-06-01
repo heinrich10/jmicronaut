@@ -1,18 +1,14 @@
 package org.heinrich10.models;
 
 import io.micronaut.data.annotation.*;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 
-@Serdeable
 @MappedEntity
 public class Country {
 
     @Id
     private String code;
-    @NotNull
     private String name;
     private Integer phone;
     private String symbol;

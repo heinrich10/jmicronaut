@@ -11,9 +11,9 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.flywaydb.core.Flyway;
-import org.heinrich10.models.Person;
 import org.heinrich10.requests.CreatePersonRequest;
 import org.heinrich10.requests.UpdatePersonRequest;
+import org.heinrich10.responses.PersonResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,7 +43,7 @@ public class PersonControllerTest {
 
     @Test
     void testGetAll() {
-        Page<Person> page = client.toBlocking().retrieve(HttpRequest.GET("/persons"), Argument.of(Page.class, Person.class));
+        Page<PersonResponse> page = client.toBlocking().retrieve(HttpRequest.GET("/persons"), Argument.of(Page.class, PersonResponse.class));
         assertNotNull(page);
         assertFalse(page.getContent().isEmpty());
     }
@@ -51,7 +51,7 @@ public class PersonControllerTest {
     @Test
     void testGetOne404() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> {
-            client.toBlocking().retrieve(HttpRequest.GET("/persons/" + UNKNOWN_PERSON_ID), Argument.of(Optional.class, Person.class));
+            client.toBlocking().retrieve(HttpRequest.GET("/persons/" + UNKNOWN_PERSON_ID), Argument.of(Optional.class, PersonResponse.class));
         });
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
@@ -60,7 +60,7 @@ public class PersonControllerTest {
     void testCreateWithBlankFirstName() {
         CreatePersonRequest invalid = new CreatePersonRequest("", "Doe", "US");
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class, () -> {
-            client.toBlocking().retrieve(HttpRequest.POST("/persons", invalid), Person.class);
+            client.toBlocking().retrieve(HttpRequest.POST("/persons", invalid), PersonResponse.class);
         });
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
@@ -74,23 +74,25 @@ public class PersonControllerTest {
         @BeforeEach
         void createPerson() {
             CreatePersonRequest create = new CreatePersonRequest("John", "Doe", "US");
-            Person person = client.toBlocking().retrieve(HttpRequest.POST("/persons", create), Person.class);
+            HttpResponse<PersonResponse> response = client.toBlocking().exchange(HttpRequest.POST("/persons", create), PersonResponse.class);
+            assertEquals(HttpStatus.CREATED, response.getStatus());
+            PersonResponse person = response.body();
             assertNotNull(person);
-            assertNotNull(person.getId());
-            personId = person.getId();
+            assertNotNull(person.id());
+            personId = person.id();
         }
 
         @Test
         @DisplayName("should retrieve the created person")
         void testRetrieve() {
-            Optional<Person> personOpt = client.toBlocking().retrieve(
-                    HttpRequest.GET("/persons/" + personId), Argument.of(Optional.class, Person.class));
+            Optional<PersonResponse> personOpt = client.toBlocking().retrieve(
+                    HttpRequest.GET("/persons/" + personId), Argument.of(Optional.class, PersonResponse.class));
             assertTrue(personOpt.isPresent());
-            Person person = personOpt.get();
-            assertEquals(personId, person.getId());
-            assertEquals("John", person.getFirstName());
-            assertEquals("Doe", person.getLastName());
-            assertEquals("US", person.getCountryCode());
+            PersonResponse person = personOpt.get();
+            assertEquals(personId, person.id());
+            assertEquals("John", person.firstName());
+            assertEquals("Doe", person.lastName());
+            assertEquals("US", person.countryCode());
         }
 
         @Test
@@ -101,13 +103,13 @@ public class PersonControllerTest {
                     HttpRequest.PUT("/persons/" + personId, update), String.class);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
-            Optional<Person> personOpt = client.toBlocking().retrieve(
-                    HttpRequest.GET("/persons/" + personId), Argument.of(Optional.class, Person.class));
+            Optional<PersonResponse> personOpt = client.toBlocking().retrieve(
+                    HttpRequest.GET("/persons/" + personId), Argument.of(Optional.class, PersonResponse.class));
             assertTrue(personOpt.isPresent());
-            Person person = personOpt.get();
-            assertEquals("Jane", person.getFirstName());
-            assertEquals("Smith", person.getLastName());
-            assertEquals("CA", person.getCountryCode());
+            PersonResponse person = personOpt.get();
+            assertEquals("Jane", person.firstName());
+            assertEquals("Smith", person.lastName());
+            assertEquals("CA", person.countryCode());
         }
     }
 }

@@ -1,22 +1,17 @@
 package org.heinrich10.models;
 
 import io.micronaut.data.annotation.*;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 
-@Serdeable
 @MappedEntity
 public class Person {
 
     @Id
     @GeneratedValue(GeneratedValue.Type.AUTO)
     private Long id;
-    @NotNull
     private String firstName;
     private String lastName;
-    @NotNull
     private String countryCode;
     @DateUpdated
     private Timestamp updatedAt;

@@ -49,6 +49,20 @@ Code coverage report (JaCoCo) is generated automatically during the `prepare-pac
 
 Tests use `@MicronautTest` for integration testing with the full application context. Controller tests exercise endpoints end-to-end via an HTTP client, and repository tests validate CRUD operations against the real database.
 
+### Architecture
+
+The application follows a layered architecture:
+
+```
+Controller → Service → Repository
+     ↓           ↓
+Response DTO   Entity
+```
+
+- **Controllers** handle HTTP concerns (routing, status codes, headers) and return dedicated response DTOs.
+- **Services** contain business logic and orchestrate transactions.
+- **Entities** (`models/`) are persistence-only and are never serialized directly to the API consumer.
+
 ### HTTP Client Files
 
 The `http/` directory contains IntelliJ HTTP Client request files for manual API testing:
@@ -69,7 +83,7 @@ Open any `.http` file in IntelliJ IDEA and click the run icon next to a request 
 |------------|-----------------------|------------------------------|
 | Persons    | `GET /persons`        | Paginated list of persons    |
 | Persons    | `GET /persons/{id}`   | Get a single person          |
-| Persons    | `POST /persons`       | Create a new person          |
+| Persons    | `POST /persons`       | Create a new person (`201 Created` + `Location` header) |
 | Persons    | `PUT /persons/{id}`   | Update an existing person    |
 | Countries  | `GET /countries`      | Paginated list of countries  |
 | Countries  | `GET /countries/{code}` | Get a single country       |

@@ -7,44 +7,46 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import jakarta.validation.Valid;
-import org.heinrich10.models.Person;
-import org.heinrich10.repositories.PersonRepository;
 import org.heinrich10.requests.CreatePersonRequest;
 import org.heinrich10.requests.UpdatePersonRequest;
+import org.heinrich10.responses.PersonResponse;
+import org.heinrich10.services.PersonService;
 
+import java.net.URI;
 import java.util.Optional;
 
 @ExecuteOn(TaskExecutors.BLOCKING)
 @Controller("/persons")
 public class PersonController {
 
-    protected final PersonRepository personRepository;
+    protected final PersonService personService;
 
-    public PersonController(PersonRepository personRepository) {
-        this.personRepository = personRepository;
+    public PersonController(PersonService personService) {
+        this.personService = personService;
     }
 
     @Get("/{id}")
-    public Optional<Person> getOne(Long id) {
-        return personRepository.findById(id);
+    public Optional<PersonResponse> getOne(Long id) {
+        return personService.findById(id);
     }
 
     @Get("/")
-    public Page<Person> getAll(
+    public Page<PersonResponse> getAll(
             @QueryValue(defaultValue = "0") Integer page,
             @QueryValue(defaultValue = "10") Integer size
     ) {
-        return personRepository.findAll(Pageable.from(page, size));
+        return personService.findAll(Pageable.from(page, size));
     }
 
     @Post("/")
-    public Person create(@Body @Valid CreatePersonRequest personRequest) {
-        return personRepository.save(personRequest.toPerson());
+    public HttpResponse<PersonResponse> create(@Body @Valid CreatePersonRequest personRequest) {
+        PersonResponse response = personService.create(personRequest);
+        return HttpResponse.created(response, URI.create("/persons/" + response.id()));
     }
 
     @Put("/{id}")
-    public HttpResponse<String> update(Long id, @Body @Valid UpdatePersonRequest personRequest) {
-        personRepository.update(personRequest.toPerson(id));
+    public HttpResponse<Void> update(Long id, @Body @Valid UpdatePersonRequest personRequest) {
+        personService.update(id, personRequest);
         return HttpResponse.noContent();
     }
 }
