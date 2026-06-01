@@ -2,10 +2,11 @@ package org.heinrich10.services;
 
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.heinrich10.models.Country;
 import org.heinrich10.repositories.CountryRepository;
-import org.heinrich10.responses.CountryResponse;
+import org.heinrich10.dto.responses.CountryResponse;
 
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ public class CountryService {
 
     private final CountryRepository countryRepository;
 
+    @Inject
     public CountryService(CountryRepository countryRepository) {
         this.countryRepository = countryRepository;
     }

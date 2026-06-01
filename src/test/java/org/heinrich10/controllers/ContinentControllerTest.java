@@ -8,7 +8,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.heinrich10.responses.ContinentResponse;
+import org.heinrich10.dto.responses.ContinentResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

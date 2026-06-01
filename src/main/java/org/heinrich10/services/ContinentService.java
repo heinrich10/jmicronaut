@@ -1,9 +1,10 @@
 package org.heinrich10.services;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.heinrich10.models.Continent;
 import org.heinrich10.repositories.ContinentRepository;
-import org.heinrich10.responses.ContinentResponse;
+import org.heinrich10.dto.responses.ContinentResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ public class ContinentService {
 
     private final ContinentRepository continentRepository;
 
+    @Inject
     public ContinentService(ContinentRepository continentRepository) {
         this.continentRepository = continentRepository;
     }

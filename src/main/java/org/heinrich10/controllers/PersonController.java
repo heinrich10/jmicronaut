@@ -6,10 +6,11 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import org.heinrich10.requests.CreatePersonRequest;
-import org.heinrich10.requests.UpdatePersonRequest;
-import org.heinrich10.responses.PersonResponse;
+import org.heinrich10.dto.requests.CreatePersonRequest;
+import org.heinrich10.dto.requests.UpdatePersonRequest;
+import org.heinrich10.dto.responses.PersonResponse;
 import org.heinrich10.services.PersonService;
 
 import java.net.URI;
@@ -19,8 +20,9 @@ import java.util.Optional;
 @Controller("/persons")
 public class PersonController {
 
-    protected final PersonService personService;
+    private final PersonService personService;
 
+    @Inject
     public PersonController(PersonService personService) {
         this.personService = personService;
     }

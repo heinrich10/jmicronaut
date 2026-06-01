@@ -7,7 +7,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import org.heinrich10.responses.CountryResponse;
+import jakarta.inject.Inject;
+import org.heinrich10.dto.responses.CountryResponse;
 import org.heinrich10.services.CountryService;
 
 import java.util.Optional;
@@ -16,8 +17,9 @@ import java.util.Optional;
 @Controller("/countries")
 public class CountryController {
 
-    protected final CountryService countryService;
+    private final CountryService countryService;
 
+    @Inject
     public CountryController(CountryService countryService) {
         this.countryService = countryService;
     }

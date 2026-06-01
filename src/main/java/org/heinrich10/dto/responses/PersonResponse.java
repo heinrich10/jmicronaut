@@ -1,4 +1,4 @@
-package org.heinrich10.responses;
+package org.heinrich10.dto.responses;
 
 import io.micronaut.serde.annotation.Serdeable;
 

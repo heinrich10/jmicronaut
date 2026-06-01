@@ -9,7 +9,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.heinrich10.responses.CountryResponse;
+import org.heinrich10.dto.responses.CountryResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

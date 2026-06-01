@@ -1,4 +1,4 @@
-package org.heinrich10.requests;
+package org.heinrich10.dto.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

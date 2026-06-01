@@ -4,7 +4,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
-import org.heinrich10.responses.ContinentResponse;
+import jakarta.inject.Inject;
+import org.heinrich10.dto.responses.ContinentResponse;
 import org.heinrich10.services.ContinentService;
 
 import java.util.List;
@@ -14,8 +15,9 @@ import java.util.Optional;
 @Controller("/continents")
 public class ContinentController {
 
-    protected final ContinentService continentService;
+    private final ContinentService continentService;
 
+    @Inject
     public ContinentController(ContinentService continentService) {
         this.continentService = continentService;
     }
