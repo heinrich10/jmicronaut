@@ -99,8 +99,8 @@ public class PersonControllerTest {
         @DisplayName("should update the person")
         void testUpdate() {
             UpdatePersonRequest update = new UpdatePersonRequest("Jane", "Smith", "CA");
-            HttpResponse<String> response = client.toBlocking().exchange(
-                    HttpRequest.PUT("/persons/" + personId, update), String.class);
+            HttpResponse<Void> response = client.toBlocking().exchange(
+                    HttpRequest.PUT("/persons/" + personId, update), Void.class);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
 
             Optional<PersonResponse> personOpt = client.toBlocking().retrieve(
