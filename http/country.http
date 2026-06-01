@@ -1,0 +1,42 @@
+# ============================================================
+# Country API Requests
+# ============================================================
+
+### Variables
+@host = http://localhost:8080
+
+###
+# @name GetAllCountries
+GET {{host}}/countries?page=0&size=10
+
+> {%
+    client.test("Get all countries returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Countries page is not empty", function() {
+        client.assert(response.body.content.length > 0, "Expected at least one country");
+    });
+%}
+
+###
+# @name GetCountry
+GET {{host}}/countries/US
+
+> {%
+    client.test("Get country returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Country name is United States", function() {
+        client.assert(response.body.name === "United States", "Unexpected country name: " + response.body.name);
+    });
+%}
+
+###
+# @name GetCountryNotFound
+GET {{host}}/countries/ZZ
+
+> {%
+    client.test("Get missing country returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}

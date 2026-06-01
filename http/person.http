@@ -1,0 +1,133 @@
+# ============================================================
+# Person API Requests
+# ============================================================
+# NOTE: Some requests depend on variables set by earlier requests.
+# Run this file from top to bottom, or execute CreatePerson first.
+# ============================================================
+
+### Variables
+@host = http://localhost:8080
+
+###
+# @name CreatePerson
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "countryCode": "US"
+}
+
+> {%
+    client.test("Create person returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Create person has id", function() {
+        client.assert(response.body.id !== undefined, "Missing id in response");
+    });
+    client.global.set("personId", response.body.id);
+%}
+
+###
+# Depends on: CreatePerson
+# @name GetPerson
+GET {{host}}/persons/{{personId}}
+
+> {%
+    client.test("Get person returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Person firstName matches", function() {
+        client.assert(response.body.firstName === "John", "firstName mismatch");
+    });
+%}
+
+###
+# Depends on: CreatePerson
+# @name UpdatePerson
+PUT {{host}}/persons/{{personId}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "countryCode": "CA"
+}
+
+> {%
+    client.test("Update person returns 204", function() {
+        client.assert(response.status === 204, "Expected 204 but got " + response.status);
+    });
+%}
+
+###
+# Depends on: UpdatePerson
+GET {{host}}/persons/{{personId}}
+
+> {%
+    client.test("Updated firstName is Jane", function() {
+        client.assert(response.body.firstName === "Jane", "firstName not updated");
+    });
+    client.test("Updated countryCode is CA", function() {
+        client.assert(response.body.countryCode === "CA", "countryCode not updated");
+    });
+%}
+
+###
+# @name GetAllPersons
+GET {{host}}/persons?page=0&size=10
+
+> {%
+    client.test("Get all persons returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Page content exists", function() {
+        client.assert(response.body.content !== undefined, "Missing page content");
+    });
+%}
+
+###
+# @name GetPersonNotFound
+GET {{host}}/persons/999999
+
+> {%
+    client.test("Get missing person returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}
+
+###
+# @name CreatePersonInvalid
+POST {{host}}/persons
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "Doe",
+  "countryCode": "US"
+}
+
+> {%
+    client.test("Create invalid person returns 400", function() {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}
+
+###
+# Depends on: CreatePerson
+# @name UpdatePersonInvalid
+PUT {{host}}/persons/{{personId}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "countryCode": ""
+}
+
+> {%
+    client.test("Update invalid person returns 400", function() {
+        client.assert(response.status === 400, "Expected 400 but got " + response.status);
+    });
+%}

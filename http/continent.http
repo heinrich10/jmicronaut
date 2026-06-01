@@ -1,0 +1,42 @@
+# ============================================================
+# Continent API Requests
+# ============================================================
+
+### Variables
+@host = http://localhost:8080
+
+###
+# @name GetAllContinents
+GET {{host}}/continents
+
+> {%
+    client.test("Get all continents returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Continents list has 7 items", function() {
+        client.assert(response.body.length === 7, "Expected 7 continents but got " + response.body.length);
+    });
+%}
+
+###
+# @name GetContinent
+GET {{host}}/continents/EU
+
+> {%
+    client.test("Get continent returns 200", function() {
+        client.assert(response.status === 200, "Expected 200 but got " + response.status);
+    });
+    client.test("Continent name is Europe", function() {
+        client.assert(response.body.name === "Europe", "Unexpected continent name: " + response.body.name);
+    });
+%}
+
+###
+# @name GetContinentNotFound
+GET {{host}}/continents/ZZ
+
+> {%
+    client.test("Get missing continent returns 404", function() {
+        client.assert(response.status === 404, "Expected 404 but got " + response.status);
+    });
+%}
