@@ -10,6 +10,7 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.heinrich10.dto.responses.CountryResponse;
+import org.heinrich10.dto.responses.ErrorResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -48,5 +49,8 @@ public class CountryControllerTest {
 
         assertNotNull(exception.getResponse());
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        ErrorResponse error = exception.getResponse().getBody(ErrorResponse.class).orElseThrow();
+        assertEquals(404, error.status());
+        assertEquals("Not Found", error.error());
     }
 }

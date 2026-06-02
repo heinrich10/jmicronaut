@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import org.flywaydb.core.Flyway;
 import org.heinrich10.dto.requests.CreatePersonRequest;
 import org.heinrich10.dto.requests.UpdatePersonRequest;
+import org.heinrich10.dto.responses.ErrorResponse;
 import org.heinrich10.dto.responses.PersonResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +55,9 @@ public class PersonControllerTest {
             client.toBlocking().retrieve(HttpRequest.GET("/persons/" + UNKNOWN_PERSON_ID), Argument.of(Optional.class, PersonResponse.class));
         });
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        ErrorResponse error = exception.getResponse().getBody(ErrorResponse.class).orElseThrow();
+        assertEquals(404, error.status());
+        assertEquals("Not Found", error.error());
     }
 
     @Test
@@ -63,6 +67,9 @@ public class PersonControllerTest {
             client.toBlocking().retrieve(HttpRequest.POST("/persons", invalid), PersonResponse.class);
         });
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        ErrorResponse error = exception.getResponse().getBody(ErrorResponse.class).orElseThrow();
+        assertEquals(400, error.status());
+        assertEquals("Bad Request", error.error());
     }
 
     @Nested
