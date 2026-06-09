@@ -16,6 +16,7 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 - **Testing**: JUnit 5 with Micronaut Test
 - **Logging**: Logback
 - **Code Coverage**: JaCoCo
+- **Management**: Micronaut Management (health, info endpoints)
 - **API Documentation**: OpenAPI (micronaut-openapi)
 
 ## Project Structure
@@ -115,6 +116,8 @@ The application starts on port `8080` by default. The H2 web console is also sta
 | Countries  | `GET /countries/{code}` | Get a single country   |
 | Continents | `GET /continents`| List all continents          |
 | Continents | `GET /continents/{code}` | Get a single continent  |
+| Health     | `GET /health`            | Application health check|
+| Info       | `GET /info`              | Application information |
 
 ## Data Model
 
