@@ -21,12 +21,6 @@ public class Person {
     public Person() {
     }
 
-    public Person(Long id, String firstName, String countryCode) {
-        this.id = id;
-        this.firstName = firstName;
-        this.countryCode = countryCode;
-    }
-
     public Person(Long id, String firstName, String lastName, String countryCode) {
         this.id = id;
         this.firstName = firstName;
