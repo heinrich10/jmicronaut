@@ -47,15 +47,19 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 │   │   │   │   └── responses/                # API response DTOs (serialization only)
 │   │   │   │       ├── ContinentResponse.java
 │   │   │   │       ├── CountryResponse.java
+│   │   │   │       ├── ErrorResponse.java
 │   │   │   │       └── PersonResponse.java
-│   │   │   ├── models/                       # Entity / domain models (persistence only)
-│   │   │   │   ├── Continent.java
-│   │   │   │   ├── Country.java
-│   │   │   │   └── Person.java
-│   │   │   ├── repositories/                 # Micronaut Data JDBC repositories
-│   │   │   │   ├── ContinentRepository.java
-│   │   │   │   ├── CountryRepository.java
-│   │   │   │   └── PersonRepository.java
+│   │   │   ├── domain/                       # Domain layer
+│   │   │   │   ├── entities/                 # Entity / domain models (persistence only)
+│   │   │   │   │   ├── Continent.java
+│   │   │   │   │   ├── Country.java
+│   │   │   │   │   └── Person.java
+│   │   │   │   └── repositories/             # Micronaut Data JDBC repositories
+│   │   │   │       ├── ContinentRepository.java
+│   │   │   │       ├── CountryRepository.java
+│   │   │   │       └── PersonRepository.java
+│   │   │   ├── exception/                    # Global exception handling
+│   │   │   │   └── GlobalExceptionHandler.java
 │   │   │   └── services/                     # Business logic / use-case layer
 │   │   │       ├── ContinentService.java
 │   │   │       ├── CountryService.java
@@ -73,8 +77,16 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 │       │   │   ├── ContinentControllerTest.java
 │       │   │   ├── CountryControllerTest.java
 │       │   │   └── PersonControllerTest.java
-│       │   └── repositories/
-│       │       └── PersonRepositoryTest.java # Direct repository CRUD test
+│       │   ├── exception/
+│       │   │   └── GlobalExceptionHandlerTest.java
+│       │   ├── HealthEndpointTest.java
+│       │   ├── InfoEndpointTest.java
+│       │   ├── repositories/
+│       │   │   └── PersonRepositoryTest.java # Direct repository CRUD test
+│       │   └── services/                     # Service-layer unit tests
+│       │       ├── ContinentServiceTest.java
+│       │       ├── CountryServiceTest.java
+│       │       └── PersonServiceTest.java
 │       └── resources/
 │           └── application-test.properties   # Test-specific datasource & Flyway overrides
 ├── AGENTS.md
@@ -103,6 +115,8 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 ```
 
 The application starts on port `8080` by default. The H2 web console is also started programmatically in `Application.java` (`Server.createWebServer().start()`).
+
+Datasource and HikariCP connection-pool settings are configured in `application.properties` (with smaller pools for tests in `application-test.properties`).
 
 ## API Overview
 
@@ -134,21 +148,25 @@ Three main entities with simple foreign-key relationships:
 - Controllers are annotated with `@ExecuteOn(TaskExecutors.BLOCKING)` because they perform blocking JDBC operations.
 - **Layered architecture**: Controllers → Services → Repositories. Controllers delegate business logic to services; they do not call repositories directly.
 - **API boundary**: Controllers return dedicated response DTOs (Java records under `dto/responses/`), never `@MappedEntity` classes. Entities are strictly for persistence.
-- Entity classes use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`). They are **not** annotated with `@Serdeable`.
+- Entity classes live under `domain/entities/` and use standard JavaBean getters/setters with Micronaut Data annotations (`@MappedEntity`, `@Id`, `@GeneratedValue`, `@DateCreated`, `@DateUpdated`). They are **not** annotated with `@Serdeable`.
+- Repositories live under `domain/repositories/` and are interfaces extending `PageableRepository` (or `CrudRepository` for `Continent`) and annotated with `@JdbcRepository(dialect = Dialect.H2)`.
+- A global exception handler (`exception/GlobalExceptionHandler.java`) returns structured `ErrorResponse` bodies for 404, 400, validation, and unhandled exceptions.
 - Request DTOs live under `dto/requests/`, extend a shared base class (`BasePersonRequest`), and use Jakarta Validation annotations (`@NotNull`, `@NotBlank`).
-- Response DTOs live under `dto/responses/` as Java records with `@Serdeable`.
-- Repositories are interfaces extending `PageableRepository` (or `CrudRepository` for `Continent`) and annotated with `@JdbcRepository(dialect = Dialect.H2)`.
+- Response DTOs live under `dto/responses/` as Java records with `@Serdeable` (including `ErrorResponse`).
 - The project uses **properties** format for configuration (`application.properties`), not YAML.
 
 ## Testing Strategy
 
-- **Framework**: JUnit 5 via `micronaut-test-junit5`.
+- **Framework**: JUnit 5 via `micronaut-test-junit5`, with **Mockito** for service-layer unit tests.
 - **Integration tests** use `@MicronautTest` to spin up the full application context.
 - **Controller tests** inject an HTTP client (`@Client("/") HttpClient`) and exercise endpoints end-to-end.
 - **Repository tests** inject the repository directly and test CRUD operations against the real database.
+- **Service unit tests** mock repositories with Mockito and verify service-layer behavior in isolation (no application context required).
 - **Test isolation**: `PersonControllerTest` resets the database before each test by calling `flyway.clean()` and `flyway.migrate()` in a `@BeforeEach` method.
 - **Focused tests**: `PersonControllerTest` uses a `@Nested` class (`WhenPersonExists`) with shared setup to keep lifecycle tests small and single-purpose.
 - **Test config** (`application-test.properties`) enables `flyway.datasources.default.clean-schema=true` so Flyway can clean the schema during tests.
+- **Management endpoint tests**: `HealthEndpointTest` and `InfoEndpointTest` verify that `/health` and `/info` are exposed and respond as expected.
+- **Global exception handling test**: `GlobalExceptionHandlerTest` verifies structured error responses for 404, 400, validation, and unhandled exceptions.
 - **Status code verification**: `PersonControllerTest` verifies that `POST /persons` returns `201 Created` with a `Location` header.
 - **Manual testing**: The `http/` directory contains IntelliJ HTTP Client files for ad-hoc API exploration and smoke testing.
 

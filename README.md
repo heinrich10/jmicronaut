@@ -16,6 +16,7 @@ A sample RESTful backend API built with the Micronaut framework. It demonstrates
 - **Testing**: JUnit 5 with Micronaut Test
 - **Logging**: Logback
 - **Code Coverage**: JaCoCo
+- **Management**: Micronaut Management (health, info endpoints)
 - **API Documentation**: OpenAPI (micronaut-openapi)
 
 ## Pre-requisites
@@ -47,7 +48,7 @@ Code coverage report (JaCoCo) is generated automatically during the `prepare-pac
 ./mvnw test
 ```
 
-Tests use `@MicronautTest` for integration testing with the full application context. Controller tests exercise endpoints end-to-end via an HTTP client, and repository tests validate CRUD operations against the real database.
+Tests use `@MicronautTest` for integration testing with the full application context. Controller tests exercise endpoints end-to-end via an HTTP client, repository tests validate CRUD operations against the real database, and service-layer unit tests use Mockito to verify business logic in isolation.
 
 ### Architecture
 
@@ -61,7 +62,9 @@ Response DTO   Entity
 
 - **Controllers** handle HTTP concerns (routing, status codes, headers) and return dedicated response DTOs.
 - **Services** contain business logic and orchestrate transactions.
-- **Entities** (`models/`) are persistence-only and are never serialized directly to the API consumer.
+- **Entities** (`domain/entities/`) are persistence-only and are never serialized directly to the API consumer.
+
+A global exception handler returns structured `ErrorResponse` bodies for common HTTP errors (404, 400, validation failures, and unhandled exceptions).
 
 ### HTTP Client Files
 
@@ -89,6 +92,8 @@ Open any `.http` file in IntelliJ IDEA and click the run icon next to a request 
 | Countries  | `GET /countries/{code}` | Get a single country       |
 | Continents | `GET /continents`     | List all continents          |
 | Continents | `GET /continents/{code}` | Get a single continent    |
+| Health     | `GET /health`         | Application health check     |
+| Info       | `GET /info`           | Application information      |
 
 ## Data Model
 
