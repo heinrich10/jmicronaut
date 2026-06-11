@@ -4,8 +4,10 @@ import org.heinrich10.dto.responses.ContinentResponse;
 import org.heinrich10.models.Continent;
 import org.heinrich10.repositories.ContinentRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +26,9 @@ class ContinentServiceTest {
     }
 
     @Test
+    @DisplayName("should return continent when found by id")
     void findByIdReturnsContinentWhenFound() {
-        Continent continent = new Continent();
-        continent.setCode("EU");
-        continent.setName("Europe");
+        Continent continent = continent("EU", "Europe");
         when(continentRepository.findById("EU")).thenReturn(Optional.of(continent));
 
         Optional<ContinentResponse> result = continentService.findById("EU");
@@ -39,6 +40,7 @@ class ContinentServiceTest {
     }
 
     @Test
+    @DisplayName("should return empty optional when continent not found")
     void findByIdReturnsEmptyWhenNotFound() {
         when(continentRepository.findById("ZZ")).thenReturn(Optional.empty());
 
@@ -49,13 +51,22 @@ class ContinentServiceTest {
     }
 
     @Test
+    @DisplayName("should propagate exception when repository findById fails")
+    void findByIdPropagatesException() {
+        RuntimeException dbError = new RuntimeException("DB down");
+        when(continentRepository.findById("EU")).thenThrow(dbError);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
+            continentService.findById("EU");
+        });
+        assertEquals("DB down", thrown.getMessage());
+    }
+
+    @Test
+    @DisplayName("should return list of continent responses")
     void findAllReturnsListOfResponses() {
-        Continent europe = new Continent();
-        europe.setCode("EU");
-        europe.setName("Europe");
-        Continent asia = new Continent();
-        asia.setCode("AS");
-        asia.setName("Asia");
+        Continent europe = continent("EU", "Europe");
+        Continent asia = continent("AS", "Asia");
         when(continentRepository.findAll()).thenReturn(List.of(europe, asia));
 
         List<ContinentResponse> result = continentService.findAll();
@@ -67,5 +78,24 @@ class ContinentServiceTest {
         assertEquals("AS", result.get(1).code());
         assertEquals("Asia", result.get(1).name());
         verify(continentRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("should return empty list when no continents exist")
+    void findAllReturnsEmptyList() {
+        when(continentRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<ContinentResponse> result = continentService.findAll();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(continentRepository).findAll();
+    }
+
+    private Continent continent(String code, String name) {
+        Continent continent = new Continent();
+        continent.setCode(code);
+        continent.setName(name);
+        return continent;
     }
 }
